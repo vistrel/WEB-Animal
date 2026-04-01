@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum AnimalGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum AdType {
+  SALE
+  ADOPTION
+  BREEDING
+  LOST_FOUND
+  RESERVED_SOLD
+}
+
+enum AdStatus {
+  ACTIVE
+  HIDDEN
+  DELETED
+  RESERVED
+  SOLD
+  FLAGGED
+}
+
+enum ModerationFlag {
+  NONE
+  NEEDS_REVIEW
+  SUSPICIOUS
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+}
+
+enum MessageStatus {
+  SENT
+  READ
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum NotificationType {
+  MESSAGE
+  FAVORITE
+  REVIEW
+  COMPLAINT
+  SYSTEM
+  MODERATION
+}
+
+model User {
+  id                       String                    @id @default(cuid())
+  role                     Role                      @default(USER)
+  status                   UserStatus                @default(ACTIVE)
+  fullName                 String
+  email                    String                    @unique
+  passwordHash             String
+  phone                    String?
+  city                     String?
+  avatarPath               String?
+  bio                      String?
+  averageRating            Decimal                   @default(0) @db.Decimal(3, 2)
+  reviewsCount             Int                       @default(0)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+
+  refreshTokens            RefreshToken[]
+  ads                      Ad[]
+  favorites                Favorite[]
+  reviewsWritten           Review[]                  @relation("WrittenReviews")
+  reviewsReceived          Review[]                  @relation("ReceivedReviews")
+  complaintsCreated        Complaint[]               @relation("ComplaintAuthor")
+  complaintsAgainst        Complaint[]               @relation("ComplaintTargetUser")
+  conversationParticipants ConversationParticipant[]
+  messages                 Message[]                 @relation("SentMessages")
+  notifications            Notification[]
+  updatedSiteTexts         SiteText[]                @relation("UpdatedByUser")
+  moderationLogs           ModerationLog[]           @relation("ModeratorUser")
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  userAgent  String?
+  ipAddress  String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PetType {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  breeds    Breed[]
+  ads       Ad[]
+}
+
+model Breed {
+  id        String   @id @default(cuid())
+  petTypeId String
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  petType   PetType  @relation(fields: [petTypeId], references: [id], onDelete: Cascade)
+  ads       Ad[]
+
+  @@unique([petTypeId, name])
+  @@index([petTypeId])
+}
+
+model Ad {
+  id               String         @id @default(cuid())
+  slug             String         @unique
+  title            String
+  description      String
+  adType           AdType
+  animalGender     AnimalGender   @default(UNKNOWN)
+  ageMonths        Int
+  price            Decimal        @default(0) @db.Decimal(10, 2)
+  city             String
+  region           String?
+  healthInfo       String
+  vaccinationInfo  String
+  documentInfo     String
+  housingInfo      String
+  status           AdStatus       @default(ACTIVE)
+  moderationFlag   ModerationFlag @default(NONE)
+  moderationReason String?
+  viewsCount       Int            @default(0)
+  publishedAt      DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  authorId         String
+  petTypeId        String
+  breedId          String?
+
+  author           User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  petType          PetType        @relation(fields: [petTypeId], references: [id], onDelete: Restrict)
+  breed            Breed?         @relation(fields: [breedId], references: [id], onDelete: SetNull)
+  images           AdImage[]
+  favorites        Favorite[]
+  reviews          Review[]
+  complaints       Complaint[]
+  conversations    Conversation[]
+  moderationLogs   ModerationLog[]
+
+  @@index([authorId])
+  @@index([petTypeId])
+  @@index([breedId])
+  @@index([status])
+  @@index([city])
+  @@index([price])
+  @@index([publishedAt])
+}
+
+model AdImage {
+  id           String   @id @default(cuid())
+  adId         String
+  path         String
+  originalName String
+  mimeType     String
+  size         Int
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  ad           Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@index([adId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  adId      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, adId])
+  @@index([userId])
+  @@index([adId])
+}
+
+model Conversation {
+  id            String                    @id @default(cuid())
+  adId          String?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  lastMessageAt DateTime?
+
+  ad            Ad?                       @relation(fields: [adId], references: [id], onDelete: SetNull)
+  participants  ConversationParticipant[]
+  messages      Message[]
+
+  @@index([adId])
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String         @id @default(cuid())
+  conversationId String
+  senderId       String
+  text           String
+  status         MessageStatus  @default(SENT)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User           @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  complaints     Complaint[]
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model Review {
+  id         String       @id @default(cuid())
+  authorId   String
+  sellerId   String
+  adId       String?
+  rating     Int
+  text       String
+  status     ReviewStatus @default(PUBLISHED)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  author     User         @relation("WrittenReviews", fields: [authorId], references: [id], onDelete: Cascade)
+  seller     User         @relation("ReceivedReviews", fields: [sellerId], references: [id], onDelete: Cascade)
+  ad         Ad?          @relation(fields: [adId], references: [id], onDelete: SetNull)
+
+  @@unique([authorId, sellerId, adId])
+  @@index([sellerId])
+  @@index([adId])
+}
+
+model Complaint {
+  id           String          @id @default(cuid())
+  authorId     String
+  targetUserId String?
+  adId         String?
+  messageId    String?
+  reason       String
+  details      String?
+  status       ComplaintStatus @default(OPEN)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  author       User            @relation("ComplaintAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetUser   User?           @relation("ComplaintTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+  ad           Ad?             @relation(fields: [adId], references: [id], onDelete: SetNull)
+  message      Message?        @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  moderationLogs ModerationLog[]
+
+  @@index([authorId])
+  @@index([targetUserId])
+  @@index([adId])
+  @@index([messageId])
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SiteText {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String
+  content     String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  updatedBy   User?    @relation("UpdatedByUser", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+model ModerationLog {
+  id          String     @id @default(cuid())
+  moderatorId String
+  adId        String?
+  complaintId String?
+  action      String
+  note        String?
+  createdAt   DateTime   @default(now())
+
+  moderator   User       @relation("ModeratorUser", fields: [moderatorId], references: [id], onDelete: Cascade)
+  ad          Ad?        @relation(fields: [adId], references: [id], onDelete: SetNull)
+  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: SetNull)
+
+  @@index([moderatorId])
+  @@index([adId])
+  @@index([complaintId])
+  @@index([createdAt])
+}
