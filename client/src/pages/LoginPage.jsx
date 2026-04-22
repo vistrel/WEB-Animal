@@ -28,7 +28,7 @@ function LoginPage() {
 
     try {
       await login(form);
-      navigate("/profil");
+      navigate("/profile");
     } catch (error) {
       setError(error?.response?.data?.message || "Не вдалося виконати вхід");
     } finally {
@@ -89,15 +89,16 @@ function LoginPage() {
           </form>
 
           <div className="form-footer-note">
-            <span>Ще не маєте акаунта?</span>
-            <Link to="/reyestratsiya">Зареєструватися</Link>
+            <br />
+            <span>Ще не маєте акаунта? </span>
+            <Link to="/register">Зареєструватися</Link>
           </div>
 
-          <div className="demo-box">
+          {/* <div className="demo-box">
             <h3>Тестовий акаунт адміністратора</h3>
             <p>Email: admin@petua.local</p>
             <p>Пароль: Admin123!</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

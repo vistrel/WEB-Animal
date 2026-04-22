@@ -11,7 +11,7 @@ function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/vkhid" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

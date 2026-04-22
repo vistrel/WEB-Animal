@@ -31,7 +31,7 @@ function RegisterPage() {
 
     try {
       await register(form);
-      navigate("/profil");
+      navigate("/profile");
     } catch (error) {
       setError(
         error?.response?.data?.message || "Не вдалося виконати реєстрацію",
@@ -136,7 +136,7 @@ function RegisterPage() {
 
           <div className="form-footer-note">
             <span>Вже маєте акаунт?</span>
-            <Link to="/vkhid">Увійти</Link>
+            <Link to="/login">Увійти</Link>
           </div>
         </div>
       </div>

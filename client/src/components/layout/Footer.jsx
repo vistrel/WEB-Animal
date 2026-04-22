@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="site-footer">
@@ -5,15 +7,16 @@ function Footer() {
         <div>
           <h3>PetUA</h3>
           <p>
-            Зручна платформа для вибору, розміщення та перегляду оголошень про
-            домашніх тварин.
+            Спеціалізована платформа для вибору, пошуку та розміщення оголошень
+            про домашніх тварин.
           </p>
         </div>
 
-        <div className="footer-badges">
-          <span className="footer-badge">🐶 Зручний вибір</span>
-          <span className="footer-badge">🐱 Структуровані оголошення</span>
-          <span className="footer-badge">🐾 Спілкування між користувачами</span>
+        <div className="footer-links">
+          <Link to="/">Головна</Link>
+          <Link to="/ads">Каталог</Link>
+          <Link to="/about">Про сервіс</Link>
+          <Link to="/login">Увійти</Link>
         </div>
       </div>
     </footer>

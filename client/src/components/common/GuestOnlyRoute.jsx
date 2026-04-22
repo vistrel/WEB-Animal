@@ -11,7 +11,7 @@ function GuestOnlyRoute({ children }) {
   }
 
   if (user) {
-    return <Navigate to="/profil" replace />;
+    return <Navigate to="/profile" replace />;
   }
 
   return children;

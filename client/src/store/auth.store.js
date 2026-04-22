@@ -7,12 +7,28 @@ import {
   registerRequest,
 } from "../api/auth.api";
 
+const AUTH_FLAG_KEY = "pet-platform-has-session";
+
+function setAuthFlag() {
+  localStorage.setItem(AUTH_FLAG_KEY, "1");
+}
+
+function clearAuthFlag() {
+  localStorage.removeItem(AUTH_FLAG_KEY);
+}
+
+function hasAuthFlag() {
+  return localStorage.getItem(AUTH_FLAG_KEY) === "1";
+}
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   accessToken: null,
   isInitializing: true,
 
   setSession: ({ user, accessToken }) => {
+    setAuthFlag();
+
     set({
       user,
       accessToken,
@@ -21,6 +37,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   clearSession: () => {
+    clearAuthFlag();
+
     set({
       user: null,
       accessToken: null,
@@ -29,8 +47,20 @@ export const useAuthStore = create((set, get) => ({
   },
 
   initializeAuth: async () => {
+    if (!hasAuthFlag()) {
+      set({
+        user: null,
+        accessToken: null,
+        isInitializing: false,
+      });
+
+      return;
+    }
+
     try {
       const data = await refreshRequest();
+
+      setAuthFlag();
 
       set({
         user: data.user,
@@ -38,6 +68,8 @@ export const useAuthStore = create((set, get) => ({
         isInitializing: false,
       });
     } catch (error) {
+      clearAuthFlag();
+
       set({
         user: null,
         accessToken: null,
@@ -48,6 +80,8 @@ export const useAuthStore = create((set, get) => ({
 
   register: async (payload) => {
     const data = await registerRequest(payload);
+
+    setAuthFlag();
 
     set({
       user: data.user,
@@ -60,6 +94,8 @@ export const useAuthStore = create((set, get) => ({
 
   login: async (payload) => {
     const data = await loginRequest(payload);
+
+    setAuthFlag();
 
     set({
       user: data.user,
@@ -74,6 +110,8 @@ export const useAuthStore = create((set, get) => ({
     try {
       await logoutRequest();
     } finally {
+      clearAuthFlag();
+
       set({
         user: null,
         accessToken: null,

@@ -35,9 +35,27 @@ function Header() {
             Головна
           </NavLink>
 
+          <NavLink
+            to="/ads"
+            className={({ isActive }) =>
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
+            Каталог
+          </NavLink>
+
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
+            Про сервіс
+          </NavLink>
+
           {user ? (
             <NavLink
-              to="/profil"
+              to="/profile"
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
@@ -67,10 +85,10 @@ function Header() {
             </>
           ) : (
             <>
-              <Link to="/vkhid" className="button button-ghost">
+              <Link to="/login" className="button button-ghost">
                 Увійти
               </Link>
-              <Link to="/reyestratsiya" className="button">
+              <Link to="/register" className="button">
                 Реєстрація
               </Link>
             </>

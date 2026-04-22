@@ -8,17 +8,9 @@ const {
   AdStatus,
   ModerationFlag,
 } = require("@prisma/client");
+const { slugify } = require("../src/utils/slugify");
 
 const prisma = new PrismaClient();
-
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/['’]/g, "")
-    .replace(/[^a-zа-яіїєґ0-9]+/gi, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 async function upsertUser(data) {
   const passwordHash = await bcrypt.hash(data.password, 10);
@@ -43,6 +35,10 @@ async function upsertUser(data) {
       city: data.city,
     },
   });
+}
+
+function makeBreedSlug(petTypeSlug, breedName) {
+  return `${petTypeSlug}-${slugify(breedName)}`;
 }
 
 async function main() {
@@ -156,22 +152,22 @@ async function main() {
 
   for (const item of breedData) {
     const petType = petTypesMap[item.petTypeSlug];
-    const slug = `${item.petTypeSlug}-${slugify(item.name)}`;
+    const breedSlug = makeBreedSlug(item.petTypeSlug, item.name);
 
     const breed = await prisma.breed.upsert({
-      where: { slug },
+      where: { slug: breedSlug },
       update: {
         name: item.name,
         petTypeId: petType.id,
       },
       create: {
         name: item.name,
-        slug,
+        slug: breedSlug,
         petTypeId: petType.id,
       },
     });
 
-    breedsMap[slug] = breed;
+    breedsMap[breedSlug] = breed;
   }
 
   for (const item of siteTexts) {
@@ -212,7 +208,7 @@ async function main() {
       moderationFlag: ModerationFlag.NONE,
       authorEmail: "olena@petua.local",
       petTypeSlug: "sobaka",
-      breedSlug: "sobaka-labrador-retryver",
+      breedName: "Лабрадор-ретривер",
     },
     {
       slug: "viddam-kishku-v-dobri-ruky-lviv",
@@ -233,7 +229,7 @@ async function main() {
       moderationFlag: ModerationFlag.NONE,
       authorEmail: "taras@petua.local",
       petTypeSlug: "kishka",
-      breedSlug: "kishka-brytanska-korotkoshersta",
+      breedName: "Британська короткошерста",
     },
     {
       slug: "vyazka-frantsuzkyi-buldoh-odesa",
@@ -254,7 +250,7 @@ async function main() {
       moderationFlag: ModerationFlag.NONE,
       authorEmail: "olena@petua.local",
       petTypeSlug: "sobaka",
-      breedSlug: "sobaka-frantsuzkyi-buldoh",
+      breedName: "Французький бульдог",
     },
     {
       slug: "znaydeno-korelu-dnipro",
@@ -275,14 +271,17 @@ async function main() {
       moderationFlag: ModerationFlag.NEEDS_REVIEW,
       authorEmail: "taras@petua.local",
       petTypeSlug: "ptakh",
-      breedSlug: "ptakh-korela",
+      breedName: "Корела",
     },
   ];
 
   for (const item of ads) {
     const author = createdUsers[item.authorEmail];
     const petType = petTypesMap[item.petTypeSlug];
-    const breed = breedsMap[item.breedSlug] || null;
+    const breedSlug = item.breedName
+      ? makeBreedSlug(item.petTypeSlug, item.breedName)
+      : null;
+    const breed = breedSlug ? breedsMap[breedSlug] || null : null;
 
     await prisma.ad.upsert({
       where: { slug: item.slug },

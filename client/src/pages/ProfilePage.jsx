@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth.store";
 
 const roleLabels = {
@@ -39,11 +40,6 @@ function ProfilePage() {
       <div className="container">
         <div className="section-head left">
           <h1>Мій профіль</h1>
-          <p>
-            На цьому етапі вже працює основа особистого кабінету. Далі сюди
-            додамо редагування профілю, аватар, оголошення, обране та
-            повідомлення.
-          </p>
         </div>
 
         <div className="profile-grid">
@@ -91,7 +87,7 @@ function ProfilePage() {
               </div>
             </div>
 
-            <div className="profile-actions">
+            <div className="profile-actions profile-actions-wrap">
               <button
                 type="button"
                 className="button"
@@ -100,6 +96,10 @@ function ProfilePage() {
               >
                 {isRefreshing ? "Оновлення..." : "Оновити дані"}
               </button>
+
+              <Link to="/ads" className="button button-secondary">
+                Перейти до каталогу
+              </Link>
             </div>
 
             {statusText ? (
@@ -120,12 +120,8 @@ function ProfilePage() {
             </article>
 
             <article className="side-card">
-              <h3>Поточний стан етапу</h3>
-              <p>
-                Backend авторизації вже підключений. Frontend отримує дані
-                користувача, зберігає access token у пам’яті та відновлює сесію
-                через refresh token.
-              </p>
+              <h3>Test</h3>
+              <p>Тут шось буде.</p>
             </article>
           </aside>
         </div>

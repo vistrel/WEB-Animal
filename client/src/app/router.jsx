@@ -1,9 +1,12 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import AdsCatalogPage from "../pages/AdsCatalogPage";
+import AdDetailsPage from "../pages/AdDetailsPage";
+import AboutPage from "../pages/AboutPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ForbiddenPage from "../pages/ForbiddenPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
@@ -19,7 +22,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "vkhid",
+        path: "login",
         element: (
           <GuestOnlyRoute>
             <LoginPage />
@@ -27,7 +30,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "reyestratsiya",
+        path: "register",
         element: (
           <GuestOnlyRoute>
             <RegisterPage />
@@ -35,7 +38,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "profil",
+        path: "profile",
         element: (
           <ProtectedRoute>
             <ProfilePage />
@@ -43,9 +46,43 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "ads",
+        element: <AdsCatalogPage />,
+      },
+      {
+        path: "ads/:slug",
+        element: <AdDetailsPage />,
+      },
+      {
+        path: "about",
+        element: <AboutPage />,
+      },
+      {
         path: "403",
         element: <ForbiddenPage />,
       },
+
+      {
+        path: "vkhid",
+        element: <Navigate to="/login" replace />,
+      },
+      {
+        path: "reyestratsiya",
+        element: <Navigate to="/register" replace />,
+      },
+      {
+        path: "profil",
+        element: <Navigate to="/profile" replace />,
+      },
+      {
+        path: "ogoloshennya",
+        element: <Navigate to="/ads" replace />,
+      },
+      {
+        path: "pro-servis",
+        element: <Navigate to="/about" replace />,
+      },
+
       {
         path: "*",
         element: <NotFoundPage />,
