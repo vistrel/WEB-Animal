@@ -1,358 +1,328 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 enum Role {
-  USER
-  MODERATOR
-  ADMIN
+    USER
+    MODERATOR
+    ADMIN
 }
 
 enum UserStatus {
-  ACTIVE
-  BLOCKED
-}
-
-enum AnimalGender {
-  MALE
-  FEMALE
-  UNKNOWN
+    ACTIVE
+    BLOCKED
 }
 
 enum AdType {
-  SALE
-  ADOPTION
-  BREEDING
-  LOST_FOUND
-  RESERVED_SOLD
+    SALE
+    ADOPTION
+    BREEDING
+    LOST_FOUND
+    RESERVED_SOLD
+}
+
+enum AnimalGender {
+    MALE
+    FEMALE
+    UNKNOWN
 }
 
 enum AdStatus {
-  ACTIVE
-  HIDDEN
-  DELETED
-  RESERVED
-  SOLD
-  FLAGGED
+    ACTIVE
+    RESERVED
+    SOLD
+    FLAGGED
+    HIDDEN
+    DELETED
 }
 
 enum ModerationFlag {
-  NONE
-  NEEDS_REVIEW
-  SUSPICIOUS
-}
-
-enum ReviewStatus {
-  PUBLISHED
-  HIDDEN
+    NONE
+    NEEDS_REVIEW
+    SUSPICIOUS
 }
 
 enum MessageStatus {
-  SENT
-  READ
+    SENT
+    READ
+}
+
+enum ReviewStatus {
+    PUBLISHED
+    HIDDEN
+    DELETED
+}
+
+enum ComplaintTargetType {
+    AD
+    USER
+    MESSAGE
+}
+
+enum ComplaintReason {
+    SPAM
+    FRAUD
+    INAPPROPRIATE
+    DANGEROUS
+    WRONG_INFO
+    OTHER
 }
 
 enum ComplaintStatus {
-  OPEN
-  IN_REVIEW
-  RESOLVED
-  REJECTED
-}
-
-enum NotificationType {
-  MESSAGE
-  FAVORITE
-  REVIEW
-  COMPLAINT
-  SYSTEM
-  MODERATION
+    NEW
+    IN_PROGRESS
+    RESOLVED
+    REJECTED
 }
 
 model User {
-  id                       String                    @id @default(cuid())
-  role                     Role                      @default(USER)
-  status                   UserStatus                @default(ACTIVE)
-  fullName                 String
-  email                    String                    @unique
-  passwordHash             String
-  phone                    String?
-  city                     String?
-  avatarPath               String?
-  bio                      String?
-  averageRating            Decimal                   @default(0) @db.Decimal(3, 2)
-  reviewsCount             Int                       @default(0)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
+    id              String     @id @default(cuid())
+    email           String     @unique
+    passwordHash    String
+    fullName        String
+    phone           String?
+    city            String?
+    bio             String?
+    avatarPath      String?
+    role            Role       @default(USER)
+    status          UserStatus @default(ACTIVE)
+    averageRating   Decimal    @default(0) @db.Decimal(3, 2)
+    reviewsCount    Int        @default(0)
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
 
-  refreshTokens            RefreshToken[]
-  ads                      Ad[]
-  favorites                Favorite[]
-  reviewsWritten           Review[]                  @relation("WrittenReviews")
-  reviewsReceived          Review[]                  @relation("ReceivedReviews")
-  complaintsCreated        Complaint[]               @relation("ComplaintAuthor")
-  complaintsAgainst        Complaint[]               @relation("ComplaintTargetUser")
-  conversationParticipants ConversationParticipant[]
-  messages                 Message[]                 @relation("SentMessages")
-  notifications            Notification[]
-  updatedSiteTexts         SiteText[]                @relation("UpdatedByUser")
-  moderationLogs           ModerationLog[]           @relation("ModeratorUser")
+    ads                     Ad[]
+    favorites               Favorite[]
+    refreshTokens           RefreshToken[]
+    conversationParticipants ConversationParticipant[]
+    messages                Message[]
+
+    writtenReviews Review[] @relation("WrittenReviews")
+    sellerReviews  Review[] @relation("SellerReviews")
+
+    createdComplaints       Complaint[] @relation("ComplaintReporter")
+    targetUserComplaints    Complaint[] @relation("ComplaintTargetUser")
+    moderatedComplaints     Complaint[] @relation("ComplaintModerator")
 }
 
 model RefreshToken {
-  id         String   @id @default(cuid())
-  tokenHash  String   @unique
-  userId     String
-  userAgent  String?
-  ipAddress  String?
-  expiresAt  DateTime
-  revokedAt  DateTime?
-  createdAt  DateTime @default(now())
+    id        String   @id @default(cuid())
+    tokenHash String   @unique
+    userId    String
+    userAgent String?
+    ipAddress String?
+    expiresAt DateTime
+    createdAt DateTime @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([expiresAt])
+    @@index([userId])
 }
 
 model PetType {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    name      String
+    slug      String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  breeds    Breed[]
-  ads       Ad[]
+    breeds Breed[]
+    ads    Ad[]
 }
 
 model Breed {
-  id        String   @id @default(cuid())
-  petTypeId String
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    name      String
+    slug      String   @unique
+    petTypeId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  petType   PetType  @relation(fields: [petTypeId], references: [id], onDelete: Cascade)
-  ads       Ad[]
+    petType PetType @relation(fields: [petTypeId], references: [id], onDelete: Cascade)
+    ads     Ad[]
 
-  @@unique([petTypeId, name])
-  @@index([petTypeId])
+    @@index([petTypeId])
 }
 
 model Ad {
-  id               String         @id @default(cuid())
-  slug             String         @unique
-  title            String
-  description      String
-  adType           AdType
-  animalGender     AnimalGender   @default(UNKNOWN)
-  ageMonths        Int
-  price            Decimal        @default(0) @db.Decimal(10, 2)
-  city             String
-  region           String?
-  healthInfo       String
-  vaccinationInfo  String
-  documentInfo     String
-  housingInfo      String
-  status           AdStatus       @default(ACTIVE)
-  moderationFlag   ModerationFlag @default(NONE)
-  moderationReason String?
-  viewsCount       Int            @default(0)
-  publishedAt      DateTime       @default(now())
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+    id                String         @id @default(cuid())
+    slug              String         @unique
+    title             String
+    description       String
+    adType            AdType
+    animalGender      AnimalGender
+    ageMonths         Int
+    price             Decimal        @default(0) @db.Decimal(12, 2)
+    city              String
+    region            String?
+    healthInfo        String
+    vaccinationInfo   String
+    documentInfo      String
+    housingInfo       String
+    status            AdStatus       @default(ACTIVE)
+    moderationFlag    ModerationFlag @default(NONE)
+    moderationReason  String?
+    viewsCount        Int            @default(0)
+    publishedAt       DateTime       @default(now())
+    createdAt         DateTime       @default(now())
+    updatedAt         DateTime       @updatedAt
 
-  authorId         String
-  petTypeId        String
-  breedId          String?
+    authorId String
+    petTypeId String
+    breedId  String?
 
-  author           User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  petType          PetType        @relation(fields: [petTypeId], references: [id], onDelete: Restrict)
-  breed            Breed?         @relation(fields: [breedId], references: [id], onDelete: SetNull)
-  images           AdImage[]
-  favorites        Favorite[]
-  reviews          Review[]
-  complaints       Complaint[]
-  conversations    Conversation[]
-  moderationLogs   ModerationLog[]
+    author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    petType PetType @relation(fields: [petTypeId], references: [id])
+    breed   Breed?  @relation(fields: [breedId], references: [id])
 
-  @@index([authorId])
-  @@index([petTypeId])
-  @@index([breedId])
-  @@index([status])
-  @@index([city])
-  @@index([price])
-  @@index([publishedAt])
+    images        AdImage[]
+    favorites     Favorite[]
+    conversations Conversation[]
+    reviews       Review[]
+    complaints    Complaint[]
+
+    @@index([authorId])
+    @@index([petTypeId])
+    @@index([breedId])
+    @@index([status])
+    @@index([city])
 }
 
 model AdImage {
-  id           String   @id @default(cuid())
-  adId         String
-  path         String
-  originalName String
-  mimeType     String
-  size         Int
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now())
+    id           String   @id @default(cuid())
+    adId         String
+    path         String
+    originalName String
+    mimeType     String
+    size         Int
+    sortOrder    Int      @default(0)
+    createdAt    DateTime @default(now())
 
-  ad           Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+    ad Ad @relation(fields: [adId], references: [id], onDelete: Cascade)
 
-  @@index([adId])
+    @@index([adId])
 }
 
 model Favorite {
-  id        String   @id @default(cuid())
-  userId    String
-  adId      String
-  createdAt DateTime @default(now())
+    id        String   @id @default(cuid())
+    userId    String
+    adId      String
+    createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    ad   Ad   @relation(fields: [adId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, adId])
-  @@index([userId])
-  @@index([adId])
+    @@unique([userId, adId])
+    @@index([adId])
 }
 
 model Conversation {
-  id            String                    @id @default(cuid())
-  adId          String?
-  createdAt     DateTime                  @default(now())
-  updatedAt     DateTime                  @updatedAt
-  lastMessageAt DateTime?
+    id            String    @id @default(cuid())
+    adId          String?
+    lastMessageAt DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
-  ad            Ad?                       @relation(fields: [adId], references: [id], onDelete: SetNull)
-  participants  ConversationParticipant[]
-  messages      Message[]
+    ad           Ad?                       @relation(fields: [adId], references: [id], onDelete: SetNull)
+    participants ConversationParticipant[]
+    messages     Message[]
 
-  @@index([adId])
-  @@index([lastMessageAt])
+    @@index([adId])
+    @@index([lastMessageAt])
 }
 
 model ConversationParticipant {
-  id             String       @id @default(cuid())
-  conversationId String
-  userId         String
-  createdAt      DateTime     @default(now())
+    id             String   @id @default(cuid())
+    conversationId String
+    userId         String
+    createdAt      DateTime @default(now())
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([conversationId, userId])
-  @@index([userId])
+    @@unique([conversationId, userId])
+    @@index([userId])
 }
 
 model Message {
-  id             String         @id @default(cuid())
-  conversationId String
-  senderId       String
-  text           String
-  status         MessageStatus  @default(SENT)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+    id             String        @id @default(cuid())
+    conversationId String
+    senderId       String
+    text           String
+    status         MessageStatus @default(SENT)
+    createdAt      DateTime      @default(now())
 
-  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User           @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  complaints     Complaint[]
+    conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+    sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([conversationId])
-  @@index([senderId])
-  @@index([createdAt])
+    complaints Complaint[]
+
+    @@index([conversationId])
+    @@index([senderId])
+    @@index([status])
 }
 
 model Review {
-  id         String       @id @default(cuid())
-  authorId   String
-  sellerId   String
-  adId       String?
-  rating     Int
-  text       String
-  status     ReviewStatus @default(PUBLISHED)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+    id        String       @id @default(cuid())
+    authorId  String
+    sellerId  String
+    adId      String?
+    rating    Int
+    text      String
+    status    ReviewStatus @default(PUBLISHED)
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
 
-  author     User         @relation("WrittenReviews", fields: [authorId], references: [id], onDelete: Cascade)
-  seller     User         @relation("ReceivedReviews", fields: [sellerId], references: [id], onDelete: Cascade)
-  ad         Ad?          @relation(fields: [adId], references: [id], onDelete: SetNull)
+    author User @relation("WrittenReviews", fields: [authorId], references: [id], onDelete: Cascade)
+    seller User @relation("SellerReviews", fields: [sellerId], references: [id], onDelete: Cascade)
+    ad     Ad?  @relation(fields: [adId], references: [id], onDelete: SetNull)
 
-  @@unique([authorId, sellerId, adId])
-  @@index([sellerId])
-  @@index([adId])
+    @@unique([authorId, sellerId, adId])
+    @@index([sellerId])
+    @@index([adId])
 }
 
 model Complaint {
-  id           String          @id @default(cuid())
-  authorId     String
-  targetUserId String?
-  adId         String?
-  messageId    String?
-  reason       String
-  details      String?
-  status       ComplaintStatus @default(OPEN)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+    id             String              @id @default(cuid())
+    targetType     ComplaintTargetType
+    reason         ComplaintReason
+    text           String?
+    status         ComplaintStatus     @default(NEW)
+    moderatorNote  String?
+    createdAt      DateTime            @default(now())
+    updatedAt      DateTime            @updatedAt
+    resolvedAt     DateTime?
 
-  author       User            @relation("ComplaintAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  targetUser   User?           @relation("ComplaintTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
-  ad           Ad?             @relation(fields: [adId], references: [id], onDelete: SetNull)
-  message      Message?        @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  moderationLogs ModerationLog[]
+    reporterId     String
+    adId           String?
+    targetUserId   String?
+    messageId      String?
+    moderatorId    String?
 
-  @@index([authorId])
-  @@index([targetUserId])
-  @@index([adId])
-  @@index([messageId])
-  @@index([status])
-}
+    reporter   User     @relation("ComplaintReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+    ad         Ad?      @relation(fields: [adId], references: [id], onDelete: SetNull)
+    targetUser User?    @relation("ComplaintTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+    message    Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+    moderator  User?    @relation("ComplaintModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
 
-model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  type      NotificationType
-  title     String
-  body      String
-  link      String?
-  isRead    Boolean          @default(false)
-  createdAt DateTime         @default(now())
-
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([isRead])
+    @@index([reporterId])
+    @@index([adId])
+    @@index([targetUserId])
+    @@index([messageId])
+    @@index([status])
+    @@index([targetType])
 }
 
 model SiteText {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  title       String
-  content     String
-  updatedById String?
-  updatedAt   DateTime @updatedAt
-
-  updatedBy   User?    @relation("UpdatedByUser", fields: [updatedById], references: [id], onDelete: SetNull)
-}
-
-model ModerationLog {
-  id          String     @id @default(cuid())
-  moderatorId String
-  adId        String?
-  complaintId String?
-  action      String
-  note        String?
-  createdAt   DateTime   @default(now())
-
-  moderator   User       @relation("ModeratorUser", fields: [moderatorId], references: [id], onDelete: Cascade)
-  ad          Ad?        @relation(fields: [adId], references: [id], onDelete: SetNull)
-  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: SetNull)
-
-  @@index([moderatorId])
-  @@index([adId])
-  @@index([complaintId])
-  @@index([createdAt])
+    id        String   @id @default(cuid())
+    key       String   @unique
+    title     String
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

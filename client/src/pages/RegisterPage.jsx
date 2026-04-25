@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth.store";
+import { isValidUkrainianPhone, normalizeUkrainianPhone } from "../utils/phone";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -27,10 +28,21 @@ function RegisterPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+
+    if (form.phone && !isValidUkrainianPhone(form.phone)) {
+      setError(
+        "Вкажіть коректний український номер телефону, наприклад +380671234567 або 0671234567",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await register(form);
+      await register({
+        ...form,
+        phone: form.phone ? normalizeUkrainianPhone(form.phone) : "",
+      });
       navigate("/profile");
     } catch (error) {
       setError(
@@ -105,7 +117,7 @@ function RegisterPage() {
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="+380..."
+                placeholder="+380671234567 або 0671234567"
                 autoComplete="tel"
               />
             </label>

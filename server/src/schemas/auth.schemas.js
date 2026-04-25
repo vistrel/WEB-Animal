@@ -1,11 +1,29 @@
 const { z } = require("zod");
+const { normalizeUkrainianPhone } = require("../utils/phone");
 
-const optionalText = z.preprocess((value) => {
-  if (typeof value !== "string") return undefined;
+const phoneSchema = z
+  .string()
+  .trim()
+  .optional()
+  .or(z.literal(""))
+  .transform((value, ctx) => {
+    if (!value) {
+      return null;
+    }
 
-  const trimmed = value.trim();
-  return trimmed.length ? trimmed : undefined;
-}, z.string().max(120).optional());
+    const normalized = normalizeUkrainianPhone(value);
+
+    if (!normalized) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Вкажіть коректний український номер телефону",
+      });
+
+      return z.NEVER;
+    }
+
+    return normalized;
+  });
 
 const registerSchema = z.object({
   body: z.object({
@@ -14,13 +32,18 @@ const registerSchema = z.object({
       .trim()
       .min(2, "Вкажіть ім’я та прізвище")
       .max(120, "Ім’я занадто довге"),
-    email: z.string().trim().email("Некоректний email"),
+    email: z.string().trim().email("Вкажіть коректний email").toLowerCase(),
     password: z
       .string()
       .min(8, "Пароль має містити щонайменше 8 символів")
-      .max(64, "Пароль занадто довгий"),
-    phone: optionalText,
-    city: optionalText,
+      .max(100, "Пароль занадто довгий"),
+    phone: phoneSchema,
+    city: z
+      .string()
+      .trim()
+      .max(80, "Назва міста занадто довга")
+      .optional()
+      .or(z.literal("")),
   }),
   params: z.object({}).optional(),
   query: z.object({}).optional(),
@@ -28,7 +51,7 @@ const registerSchema = z.object({
 
 const loginSchema = z.object({
   body: z.object({
-    email: z.string().trim().email("Некоректний email"),
+    email: z.string().trim().email("Вкажіть коректний email").toLowerCase(),
     password: z.string().min(1, "Вкажіть пароль"),
   }),
   params: z.object({}).optional(),

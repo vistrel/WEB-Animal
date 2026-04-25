@@ -1,7 +1,7 @@
 const ApiError = require("../utils/api-error");
 
-function allowRoles(...roles) {
-  return function roleMiddleware(req, res, next) {
+function requireRoles(...roles) {
+  return (req, res, next) => {
     if (!req.user) {
       return next(new ApiError(401, "Потрібна авторизація"));
     }
@@ -14,4 +14,8 @@ function allowRoles(...roles) {
   };
 }
 
+const allowRoles = requireRoles;
+
 module.exports = allowRoles;
+module.exports.allowRoles = allowRoles;
+module.exports.requireRoles = requireRoles;

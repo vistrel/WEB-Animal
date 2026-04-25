@@ -34,6 +34,45 @@ export const sortOptions = [
   { value: "popular", label: "Популярні" },
 ];
 
+function getApiOrigin() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  return apiUrl.replace(/\/api\/?$/, "");
+}
+
+function escapeSvgText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export function resolveMediaUrl(value, fallbackTitle = "Оголошення") {
+  if (!value) {
+    return createPlaceholderImage(fallbackTitle);
+  }
+
+  if (
+    value.startsWith("data:") ||
+    value.startsWith("http://") ||
+    value.startsWith("https://")
+  ) {
+    return value;
+  }
+
+  const apiOrigin = getApiOrigin();
+
+  if (value.startsWith("/uploads/")) {
+    return `${apiOrigin}${value}`;
+  }
+
+  if (value.startsWith("uploads/")) {
+    return `${apiOrigin}/${value}`;
+  }
+
+  return `${apiOrigin}/uploads/${value.replace(/^\/+/, "")}`;
+}
+
 export function formatPrice(value) {
   const number = Number(value || 0);
 
@@ -62,7 +101,8 @@ export function formatAge(months) {
 }
 
 export function createPlaceholderImage(title = "Оголошення") {
-  const safeTitle = encodeURIComponent(title.slice(0, 28));
+  const safeTitle = escapeSvgText(title.slice(0, 34));
+
   const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
             <defs>
@@ -74,16 +114,17 @@ export function createPlaceholderImage(title = "Оголошення") {
             <rect width="800" height="560" fill="url(#g)" />
             <circle cx="170" cy="155" r="58" fill="rgba(255,255,255,0.45)" />
             <circle cx="630" cy="120" r="42" fill="rgba(255,255,255,0.35)" />
-            <text x="50%" y="44%" text-anchor="middle" font-size="82">🐾</text>
-            <text x="50%" y="58%" text-anchor="middle" font-size="28" font-family="Arial, sans-serif" fill="#5a3f31">${safeTitle}</text>
+            <text x="50%" y="43%" text-anchor="middle" font-size="86">🐾</text>
+            <text x="50%" y="59%" text-anchor="middle" font-size="30" font-family="Arial, sans-serif" fill="#5a3f31">${safeTitle}</text>
         </svg>
     `;
 
-  return `data:image/svg+xml;charset=UTF-8,${svg}`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
 export function getAdImage(ad) {
-  return (
-    ad?.imageUrl || ad?.images?.[0]?.url || createPlaceholderImage(ad?.title)
+  return resolveMediaUrl(
+    ad?.imageUrl || ad?.images?.[0]?.url,
+    ad?.title || "Оголошення",
   );
 }

@@ -1,14 +1,18 @@
 function serializeUser(user) {
+  if (!user) {
+    return null;
+  }
+
   return {
     id: user.id,
-    role: user.role,
-    status: user.status,
     fullName: user.fullName,
     email: user.email,
     phone: user.phone || null,
     city: user.city || null,
-    avatarPath: user.avatarPath || null,
     bio: user.bio || null,
+    avatarPath: user.avatarPath || null,
+    role: user.role,
+    status: user.status,
     averageRating: Number(user.averageRating || 0),
     reviewsCount: user.reviewsCount || 0,
     createdAt: user.createdAt,

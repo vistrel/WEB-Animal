@@ -6,11 +6,18 @@ import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
 import AdsCatalogPage from "../pages/AdsCatalogPage";
 import AdDetailsPage from "../pages/AdDetailsPage";
+import CreateAdPage from "../pages/CreateAdPage";
+import EditAdPage from "../pages/EditAdPage";
+import FavoritesPage from "../pages/FavoritesPage";
+import MessagesPage from "../pages/MessagesPage";
+import SellerPage from "../pages/SellerPage";
+import ModerationPage from "../pages/ModerationPage";
 import AboutPage from "../pages/AboutPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ForbiddenPage from "../pages/ForbiddenPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import GuestOnlyRoute from "../components/common/GuestOnlyRoute";
+import RoleRoute from "../components/common/RoleRoute";
 
 const router = createBrowserRouter([
   {
@@ -46,12 +53,56 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "favorites",
+        element: (
+          <ProtectedRoute>
+            <FavoritesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "messages",
+        element: (
+          <ProtectedRoute>
+            <MessagesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "moderation",
+        element: (
+          <RoleRoute roles={["MODERATOR", "ADMIN"]}>
+            <ModerationPage />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "create-ad",
+        element: (
+          <ProtectedRoute>
+            <CreateAdPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "edit-ad/:id",
+        element: (
+          <ProtectedRoute>
+            <EditAdPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "ads",
         element: <AdsCatalogPage />,
       },
       {
         path: "ads/:slug",
         element: <AdDetailsPage />,
+      },
+      {
+        path: "users/:id",
+        element: <SellerPage />,
       },
       {
         path: "about",
@@ -61,7 +112,6 @@ const router = createBrowserRouter([
         path: "403",
         element: <ForbiddenPage />,
       },
-
       {
         path: "vkhid",
         element: <Navigate to="/login" replace />,
@@ -82,7 +132,6 @@ const router = createBrowserRouter([
         path: "pro-servis",
         element: <Navigate to="/about" replace />,
       },
-
       {
         path: "*",
         element: <NotFoundPage />,
