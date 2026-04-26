@@ -105,6 +105,17 @@ const createAdComplaint = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Не можна поскаржитися на власне оголошення");
   }
 
+  const existingComplaint = await prisma.complaint.findFirst({
+    where: {
+      reporterId: req.user.id,
+      adId,
+    },
+  });
+
+  if (existingComplaint) {
+    throw new ApiError(409, "Ви вже надсилали скаргу на це оголошення");
+  }
+
   const complaint = await prisma.complaint.create({
     data: {
       targetType: "AD",
@@ -145,6 +156,17 @@ const createUserComplaint = asyncHandler(async (req, res) => {
 
   if (!targetUser) {
     throw new ApiError(404, "Користувача не знайдено");
+  }
+
+  const existingComplaint = await prisma.complaint.findFirst({
+    where: {
+      reporterId: req.user.id,
+      targetUserId: userId,
+    },
+  });
+
+  if (existingComplaint) {
+    throw new ApiError(409, "Ви вже надсилали скаргу на цього користувача");
   }
 
   const complaint = await prisma.complaint.create({
@@ -191,6 +213,17 @@ const createMessageComplaint = asyncHandler(async (req, res) => {
 
   if (message.senderId === req.user.id) {
     throw new ApiError(400, "Не можна поскаржитися на власне повідомлення");
+  }
+
+  const existingComplaint = await prisma.complaint.findFirst({
+    where: {
+      reporterId: req.user.id,
+      messageId,
+    },
+  });
+
+  if (existingComplaint) {
+    throw new ApiError(409, "Ви вже надсилали скаргу на це повідомлення");
   }
 
   const complaint = await prisma.complaint.create({

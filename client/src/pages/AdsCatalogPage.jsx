@@ -14,7 +14,7 @@ import {
   getMarketplaceFiltersFromSearchParams,
 } from "../utils/marketplace";
 import { useSearchParams } from "react-router-dom";
-
+import Seo from "../components/common/Seo";
 function AdsCatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() =>
@@ -206,6 +206,11 @@ function AdsCatalogPage() {
 
   return (
     <div className="page">
+      <Seo
+        title="Каталог оголошень"
+        description="Каталог оголошень PetUA з пошуком, фільтрами за видом тварини, породою, ціною, містом, статтю, віком та типом оголошення."
+        path="/ads"
+      />
       <div className="container">
         <MarketplaceFilters
           title="Каталог оголошень"

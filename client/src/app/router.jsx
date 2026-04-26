@@ -12,7 +12,11 @@ import FavoritesPage from "../pages/FavoritesPage";
 import MessagesPage from "../pages/MessagesPage";
 import SellerPage from "../pages/SellerPage";
 import ModerationPage from "../pages/ModerationPage";
+import AdminPage from "../pages/AdminPage";
 import AboutPage from "../pages/AboutPage";
+import RulesPage from "../pages/RulesPage";
+import ContactsPage from "../pages/ContactsPage";
+import PrivacyPage from "../pages/PrivacyPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ForbiddenPage from "../pages/ForbiddenPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
@@ -77,6 +81,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "admin",
+        element: (
+          <RoleRoute roles={["ADMIN"]}>
+            <AdminPage />
+          </RoleRoute>
+        ),
+      },
+      {
         path: "create-ad",
         element: (
           <ProtectedRoute>
@@ -107,6 +119,18 @@ const router = createBrowserRouter([
       {
         path: "about",
         element: <AboutPage />,
+      },
+      {
+        path: "rules",
+        element: <RulesPage />,
+      },
+      {
+        path: "contacts",
+        element: <ContactsPage />,
+      },
+      {
+        path: "privacy",
+        element: <PrivacyPage />,
       },
       {
         path: "403",

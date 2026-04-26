@@ -111,17 +111,19 @@ model User {
 }
 
 model RefreshToken {
-    id        String   @id @default(cuid())
-    tokenHash String   @unique
+    id        String    @id @default(cuid())
+    tokenHash String    @unique
     userId    String
     userAgent String?
     ipAddress String?
     expiresAt DateTime
-    createdAt DateTime @default(now())
+    revokedAt DateTime?
+    createdAt DateTime  @default(now())
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId])
+    @@index([revokedAt])
 }
 
 model PetType {

@@ -1,51 +1,15 @@
-import { useEffect, useState } from "react";
-import { healthRequest } from "../api/public.api";
+import { Link } from "react-router-dom";
+import Seo from "../components/common/Seo";
 
 function AboutPage() {
-  const [serverState, setServerState] = useState({
-    loading: true,
-    ok: false,
-    text: "Перевірка підключення...",
-  });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function checkServer() {
-      try {
-        await healthRequest();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setServerState({
-          loading: false,
-          ok: true,
-          text: "Сервер підключено",
-        });
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        setServerState({
-          loading: false,
-          ok: false,
-          text: "Сервер тимчасово недоступний",
-        });
-      }
-    }
-
-    checkServer();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   return (
     <div className="page">
+      <Seo
+        title="Про сервіс"
+        description="PetUA — спеціалізована платформа для пошуку, вибору, розміщення оголошень, спілкування та модерації у сфері домашніх тварин."
+        path="/about"
+      />
+
       <section className="hero-section">
         <div className="container hero-grid">
           <div className="hero-content">
@@ -54,71 +18,67 @@ function AboutPage() {
             </span>
 
             <h1>
-              Платформа створена для
+              PetUA допомагає
               <span className="accent-text">
                 {" "}
-                зручного вибору та розміщення оголошень
+                знайти тварину та безпечно зв’язатися з продавцем
               </span>
             </h1>
 
             <p className="hero-text">
-              Сервіс орієнтований на структуровану подачу інформації про тварин,
-              фільтрацію за ключовими параметрами, зрозумілий інтерфейс та
-              подальшу комунікацію між продавцем і покупцем.
+              PetUA — це платформа для оголошень про домашніх тварин, де
+              інформація подається структуровано, пошук працює за важливими
+              параметрами, а користувачі можуть спілкуватися, зберігати обране,
+              залишати відгуки та подавати скарги.
             </p>
 
+            <div className="hero-actions">
+              <Link to="/ads" className="button">
+                Перейти до каталогу
+              </Link>
+
+              <Link to="/rules" className="button button-secondary">
+                Правила сервісу
+              </Link>
+            </div>
+
             <div className="hero-status-row">
-              <span
-                className={
-                  serverState.ok ? "status-pill success" : "status-pill"
-                }
-              >
-                {serverState.text}
-              </span>
               <span className="status-pill">
-                Підтримка світлої та темної теми
+                Пошук за видом, породою та містом
               </span>
-              <span className="status-pill">
-                Підготовка до чату та модерації
-              </span>
+              <span className="status-pill">Внутрішній чат</span>
+              <span className="status-pill">Відгуки та рейтинг</span>
             </div>
           </div>
 
-          <div className="hero-card">
+          <div className="hero-card about-hero-card">
             <div className="hero-card-top">
               <span className="hero-card-icon">🐾</span>
-              <span className="hero-card-label">Ключові ідеї проєкту</span>
+              <span className="hero-card-label">Що робить PetUA зручним</span>
             </div>
 
             <div className="feature-list">
               <div className="feature-item">
-                <h3>Зручний вибір тварини</h3>
+                <h3>Структуровані оголошення</h3>
                 <p>
-                  Пошук, фільтри, сортування та структурована сторінка
-                  оголошення.
+                  Кожне оголошення містить вид тварини, породу, стать, вік,
+                  ціну, місто, стан здоров’я, щеплення, документи та фото.
                 </p>
               </div>
 
               <div className="feature-item">
-                <h3>Зручне розміщення оголошень</h3>
+                <h3>Швидкий вибір</h3>
                 <p>
-                  Особистий кабінет користувача та підготовлена основа для
-                  редагування записів.
+                  Користувач може фільтрувати оголошення за типом, видом,
+                  породою, ціною, містом, статтю та віком.
                 </p>
               </div>
 
               <div className="feature-item">
-                <h3>Комунікація між користувачами</h3>
+                <h3>Довіра до продавців</h3>
                 <p>
-                  Архітектура вже готова під внутрішній чат та повідомлення.
-                </p>
-              </div>
-
-              <div className="feature-item">
-                <h3>Контроль якості контенту</h3>
-                <p>
-                  Передбачені скарги, модерація, ролі та адміністративні
-                  можливості.
+                  Рейтинг, відгуки, сторінка продавця та скарги допомагають
+                  краще оцінити пропозицію перед спілкуванням.
                 </p>
               </div>
             </div>
@@ -129,50 +89,162 @@ function AboutPage() {
       <section className="info-section">
         <div className="container">
           <div className="section-head">
-            <h2>Що закладено в основу системи</h2>
+            <h2>Для кого створено PetUA</h2>
             <p>
-              Поточна архітектура одразу орієнтована на дипломний формат:
-              каталог, профілі, чат, рейтинг, скарги, модерацію та базову
-              адмін-панель.
+              Сервіс підходить людям, які шукають домашню тварину, власникам,
+              заводчикам, волонтерам і користувачам, які хочуть розмістити
+              оголошення у зрозумілому форматі.
             </p>
           </div>
 
           <div className="cards-grid">
             <article className="info-card">
-              <span className="card-emoji">🔐</span>
-              <h3>Авторизація та ролі</h3>
+              <span className="card-emoji">🐶</span>
+              <h3>Для покупців</h3>
               <p>
-                Підтримуються користувач, модератор та адміністратор із
-                розмежуванням доступу.
+                Каталог допомагає швидко порівняти оголошення, переглянути фото,
+                характеристики тварини, рейтинг продавця та відгуки.
               </p>
             </article>
 
             <article className="info-card">
-              <span className="card-emoji">📚</span>
-              <h3>Каталог оголошень</h3>
+              <span className="card-emoji">🏡</span>
+              <h3>Для власників тварин</h3>
               <p>
-                Маркетплейс уже працює на головній сторінці та має окремий
-                каталог із фільтрами.
+                Користувач може створити оголошення, додати фото, описати умови
+                утримання, документи, щеплення та контактні дані.
               </p>
             </article>
 
             <article className="info-card">
               <span className="card-emoji">💬</span>
-              <h3>Підготовка до реального спілкування</h3>
+              <h3>Для спілкування</h3>
               <p>
-                Схема бази вже містить сутності для діалогів, повідомлень та
-                подальшого Socket.IO.
+                Внутрішні повідомлення дозволяють покупцю і продавцю уточнити
+                деталі без переходу в сторонні месенджери.
               </p>
             </article>
 
             <article className="info-card">
               <span className="card-emoji">🛡️</span>
-              <h3>Модерація та довіра</h3>
+              <h3>Для безпеки</h3>
               <p>
-                Проєкт одразу розвивається як контрольована система з рейтингом
-                та скаргами.
+                Скарги, модерація, ролі користувачів і приховування проблемних
+                оголошень допомагають підтримувати порядок на платформі.
               </p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-process-section">
+        <div className="container">
+          <div className="section-head">
+            <h2>Як працює сервіс</h2>
+            <p>
+              PetUA побудовано так, щоб користувач міг пройти шлях від пошуку
+              тварини до спілкування з продавцем без зайвих кроків.
+            </p>
+          </div>
+
+          <div className="process-grid">
+            <article>
+              <span>1</span>
+              <h3>Пошук оголошення</h3>
+              <p>
+                Користувач відкриває каталог, вводить запит або використовує
+                фільтри за видом тварини, породою, ціною, містом, статтю та
+                віком.
+              </p>
+            </article>
+
+            <article>
+              <span>2</span>
+              <h3>Перегляд деталей</h3>
+              <p>
+                На сторінці оголошення видно фото, опис, характеристики, стан
+                здоров’я, щеплення, документи та умови утримання.
+              </p>
+            </article>
+
+            <article>
+              <span>3</span>
+              <h3>Перевірка продавця</h3>
+              <p>
+                Перед зверненням можна переглянути сторінку продавця, рейтинг,
+                кількість відгуків та інші активні оголошення.
+              </p>
+            </article>
+
+            <article>
+              <span>4</span>
+              <h3>Комунікація</h3>
+              <p>
+                Покупець може написати продавцю через внутрішній чат і уточнити
+                всі важливі деталі.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-values-section">
+        <div className="container about-values-grid">
+          <div>
+            <span className="hero-kicker">Принципи PetUA</span>
+            <h2>
+              Ми робимо акцент на зрозумілості, безпеці та відповідальному
+              виборі
+            </h2>
+            <p>
+              Платформа не замінює особисту перевірку продавця або ветеринарну
+              консультацію, але допомагає краще структурувати інформацію та
+              зменшити хаос у процесі пошуку домашньої тварини.
+            </p>
+          </div>
+
+          <div className="values-list">
+            <article>
+              <strong>Прозорість</strong>
+              <span>Кожне оголошення має зрозумілі поля та статус.</span>
+            </article>
+
+            <article>
+              <strong>Контроль</strong>
+              <span>
+                Користувачі можуть подавати скарги, а модератори — реагувати.
+              </span>
+            </article>
+
+            <article>
+              <strong>Зручність</strong>
+              <span>
+                Каталог, обране, чат і профіль зібрані в одній системі.
+              </span>
+            </article>
+
+            <article>
+              <strong>Адаптивність</strong>
+              <span>Інтерфейс працює на комп’ютері, планшеті та телефоні.</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-cta-section">
+        <div className="container">
+          <div className="about-cta-card">
+            <div>
+              <h2>Готові знайти домашнього улюбленця?</h2>
+              <p>
+                Перейдіть до каталогу, скористайтеся фільтрами та збережіть
+                цікаві оголошення в обране.
+              </p>
+            </div>
+
+            <Link to="/ads" className="button">
+              Відкрити каталог
+            </Link>
           </div>
         </div>
       </section>

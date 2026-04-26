@@ -13,7 +13,7 @@ import {
   defaultMarketplaceFilters,
   getMarketplaceFiltersFromSearchParams,
 } from "../utils/marketplace";
-
+import Seo from "../components/common/Seo";
 function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() =>
@@ -193,6 +193,11 @@ function HomePage() {
 
   return (
     <div className="page">
+      <Seo
+        title="PetUA — вибір та продаж домашніх тварин"
+        description="Маркетплейс домашніх тварин з каталогом, фільтрами, оголошеннями, обраним, чатом, відгуками та модерацією."
+        path="/"
+      />
       <div className="container">
         <section className="marketplace-hero">
           <div className="marketplace-hero-copy">
@@ -253,7 +258,7 @@ function HomePage() {
         </section>
 
         <section className="info-section">
-          <div className="section-head">
+          <div className="section-head section-head-home">
             <h2>Чому цей формат зручний</h2>
             <p>
               Проєкт одразу працює як спеціалізована інформаційна система для

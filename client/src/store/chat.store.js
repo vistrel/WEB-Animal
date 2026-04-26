@@ -9,7 +9,16 @@ function getTotalUnread(conversations) {
   );
 }
 
+function isSoundEnabled() {
+  const value = localStorage.getItem("petua:sound-enabled");
+  return value === null ? true : value === "true";
+}
+
 function playIncomingMessageSound() {
+  if (!isSoundEnabled()) {
+    return;
+  }
+
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
 
