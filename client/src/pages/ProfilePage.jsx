@@ -10,6 +10,7 @@ import {
   formatAge,
   formatPrice,
   getAdImage,
+  handleImageError,
   resolveMediaUrl,
   statusLabels,
 } from "../utils/ads";
@@ -261,7 +262,13 @@ function ProfilePage() {
             <div className="profile-top">
               <label className="profile-avatar editable-avatar">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt={user?.fullName || "Аватар"} />
+                  <img
+                    src={avatarUrl}
+                    alt={user?.fullName || "Аватар"}
+                    onError={(event) =>
+                      handleImageError(event, user?.fullName || "Аватар")
+                    }
+                  />
                 ) : (
                   <span>
                     {user?.fullName?.trim()?.charAt(0)?.toUpperCase() || "U"}
@@ -426,7 +433,11 @@ function ProfilePage() {
                       to={`/ads/${ad.slug}`}
                       className="favorite-preview-item"
                     >
-                      <img src={getAdImage(ad)} alt={ad.title} />
+                      <img
+                        src={getAdImage(ad)}
+                        alt={ad.title}
+                        onError={(event) => handleImageError(event, ad.title)}
+                      />
                       <span>{ad.title}</span>
                     </Link>
                   ))}
@@ -471,6 +482,7 @@ function ProfilePage() {
                     className="my-ad-image"
                     src={getAdImage(ad)}
                     alt={ad.title}
+                    onError={(event) => handleImageError(event, ad.title)}
                   />
 
                   <div className="my-ad-body">

@@ -24,6 +24,43 @@ const orderByMap = {
   popular: [{ viewsCount: "desc" }, { publishedAt: "desc" }],
 };
 
+const adCardInclude = {
+  petType: {
+    select: {
+      name: true,
+      slug: true,
+    },
+  },
+  breed: {
+    select: {
+      name: true,
+      slug: true,
+    },
+  },
+  author: {
+    select: {
+      id: true,
+      fullName: true,
+      city: true,
+      averageRating: true,
+      reviewsCount: true,
+    },
+  },
+  images: {
+    select: {
+      path: true,
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    take: 1,
+  },
+};
+
+function normalizeSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
 function buildAdsWhere(query) {
   const where = {
     status: {
@@ -131,37 +168,6 @@ function buildAdsWhere(query) {
   return where;
 }
 
-const adCardInclude = {
-  petType: {
-    select: {
-      name: true,
-      slug: true,
-    },
-  },
-  breed: {
-    select: {
-      name: true,
-      slug: true,
-    },
-  },
-  author: {
-    select: {
-      id: true,
-      fullName: true,
-      city: true,
-      averageRating: true,
-      reviewsCount: true,
-    },
-  },
-  images: {
-    select: {
-      path: true,
-    },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    take: 1,
-  },
-};
-
 const listAds = asyncHandler(async (req, res) => {
   const query = req.validated.query;
   const where = buildAdsWhere(query);
@@ -190,13 +196,13 @@ const listAds = asyncHandler(async (req, res) => {
 });
 
 const getAdBySlug = asyncHandler(async (req, res) => {
-  const { slug } = req.validated.params;
+  const slug = normalizeSlug(req.validated.params.slug);
 
   const ad = await prisma.ad.findFirst({
     where: {
-      slug,
-      status: {
-        in: visibleStatuses,
+      slug: {
+        equals: slug,
+        mode: "insensitive",
       },
     },
     include: {
@@ -235,6 +241,10 @@ const getAdBySlug = asyncHandler(async (req, res) => {
   });
 
   if (!ad) {
+    throw new ApiError(404, "Оголошення не знайдено");
+  }
+
+  if (!visibleStatuses.includes(ad.status)) {
     throw new ApiError(404, "Оголошення не знайдено");
   }
 

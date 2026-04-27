@@ -16,6 +16,9 @@ export const statusLabels = {
   ACTIVE: "Активне",
   RESERVED: "Резерв",
   SOLD: "Продано",
+  FLAGGED: "На перевірці",
+  HIDDEN: "Приховане",
+  DELETED: "Видалене",
 };
 
 export const ageGroupLabels = {
@@ -45,6 +48,36 @@ function escapeSvgText(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+export function createPlaceholderImage(title = "Оголошення") {
+  const safeTitle = escapeSvgText(title.slice(0, 34));
+
+  const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
+            <defs>
+                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ffe4cf" />
+                    <stop offset="100%" stop-color="#f3b28a" />
+                </linearGradient>
+            </defs>
+            <rect width="800" height="560" fill="url(#g)" />
+            <circle cx="170" cy="155" r="58" fill="rgba(255,255,255,0.45)" />
+            <circle cx="630" cy="120" r="42" fill="rgba(255,255,255,0.35)" />
+            <text x="50%" y="43%" text-anchor="middle" font-size="86">🐾</text>
+            <text x="50%" y="59%" text-anchor="middle" font-size="30" font-family="Arial, sans-serif" fill="#5a3f31">${safeTitle}</text>
+        </svg>
+    `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+export function handleImageError(event, fallbackTitle = "Оголошення") {
+  const fallback = createPlaceholderImage(fallbackTitle);
+
+  if (event.currentTarget.src !== fallback) {
+    event.currentTarget.src = fallback;
+  }
 }
 
 export function resolveMediaUrl(value, fallbackTitle = "Оголошення") {
@@ -100,31 +133,9 @@ export function formatAge(months) {
   return `${years} р. ${restMonths} міс.`;
 }
 
-export function createPlaceholderImage(title = "Оголошення") {
-  const safeTitle = escapeSvgText(title.slice(0, 34));
-
-  const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
-            <defs>
-                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#ffe4cf" />
-                    <stop offset="100%" stop-color="#f3b28a" />
-                </linearGradient>
-            </defs>
-            <rect width="800" height="560" fill="url(#g)" />
-            <circle cx="170" cy="155" r="58" fill="rgba(255,255,255,0.45)" />
-            <circle cx="630" cy="120" r="42" fill="rgba(255,255,255,0.35)" />
-            <text x="50%" y="43%" text-anchor="middle" font-size="86">🐾</text>
-            <text x="50%" y="59%" text-anchor="middle" font-size="30" font-family="Arial, sans-serif" fill="#5a3f31">${safeTitle}</text>
-        </svg>
-    `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 export function getAdImage(ad) {
   return resolveMediaUrl(
-    ad?.imageUrl || ad?.images?.[0]?.url,
+    ad?.imageUrl || ad?.images?.[0]?.url || ad?.images?.[0]?.path,
     ad?.title || "Оголошення",
   );
 }
