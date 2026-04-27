@@ -6,7 +6,7 @@ const {
   serializeAdDetails,
 } = require("../utils/ad-serializers");
 
-const visibleStatuses = ["ACTIVE", "RESERVED", "SOLD"];
+const visibleStatuses = ["ACTIVE", "RESERVED", "SOLD", "FLAGGED"];
 
 const ageRangeMap = {
   baby: { gte: 0, lte: 6 },
@@ -131,6 +131,37 @@ function buildAdsWhere(query) {
   return where;
 }
 
+const adCardInclude = {
+  petType: {
+    select: {
+      name: true,
+      slug: true,
+    },
+  },
+  breed: {
+    select: {
+      name: true,
+      slug: true,
+    },
+  },
+  author: {
+    select: {
+      id: true,
+      fullName: true,
+      city: true,
+      averageRating: true,
+      reviewsCount: true,
+    },
+  },
+  images: {
+    select: {
+      path: true,
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    take: 1,
+  },
+};
+
 const listAds = asyncHandler(async (req, res) => {
   const query = req.validated.query;
   const where = buildAdsWhere(query);
@@ -143,36 +174,7 @@ const listAds = asyncHandler(async (req, res) => {
       orderBy,
       skip: (query.page - 1) * query.limit,
       take: query.limit,
-      include: {
-        petType: {
-          select: {
-            name: true,
-            slug: true,
-          },
-        },
-        breed: {
-          select: {
-            name: true,
-            slug: true,
-          },
-        },
-        author: {
-          select: {
-            id: true,
-            fullName: true,
-            city: true,
-            averageRating: true,
-            reviewsCount: true,
-          },
-        },
-        images: {
-          select: {
-            path: true,
-          },
-          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-          take: 1,
-        },
-      },
+      include: adCardInclude,
     }),
   ]);
 
@@ -259,36 +261,7 @@ const getAdBySlug = asyncHandler(async (req, res) => {
     },
     take: 4,
     orderBy: [{ publishedAt: "desc" }],
-    include: {
-      petType: {
-        select: {
-          name: true,
-          slug: true,
-        },
-      },
-      breed: {
-        select: {
-          name: true,
-          slug: true,
-        },
-      },
-      author: {
-        select: {
-          id: true,
-          fullName: true,
-          city: true,
-          averageRating: true,
-          reviewsCount: true,
-        },
-      },
-      images: {
-        select: {
-          path: true,
-        },
-        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-        take: 1,
-      },
-    },
+    include: adCardInclude,
   });
 
   const serializedAd = serializeAdDetails({

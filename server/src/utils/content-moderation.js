@@ -3,6 +3,46 @@ function countMatches(value, pattern) {
   return matches ? matches.length : 0;
 }
 
+function hasSuspiciousRepeatedWords(text) {
+  const words = text.match(/[a-zа-яіїєґ0-9]+/giu) || [];
+
+  if (words.length < 12) {
+    return false;
+  }
+
+  const counts = words.reduce((acc, word) => {
+    if (word.length < 3) {
+      return acc;
+    }
+
+    acc[word] = (acc[word] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.values(counts).some((count) => count >= 7);
+}
+
+function hasSuspiciousRepeatedPhrases(text) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+
+  if (normalized.length < 80) {
+    return false;
+  }
+
+  const chunks = [];
+
+  for (let index = 0; index < normalized.length - 18; index += 6) {
+    chunks.push(normalized.slice(index, index + 18));
+  }
+
+  const counts = chunks.reduce((acc, chunk) => {
+    acc[chunk] = (acc[chunk] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.values(counts).some((count) => count >= 4);
+}
+
 function analyzeAdContent(payload) {
   const text = [
     payload.title,
@@ -24,15 +64,18 @@ function analyzeAdContent(payload) {
     text,
     /(https?:\/\/|www\.|\.com|\.net|\.org|\.top|\.xyz|\.info)/gi,
   );
+
   const contactSpamCount = countMatches(
     text,
     /(telegram|viber|whatsapp|вайбер|телеграм|ватсап|пишіть в лс)/gi,
   );
+
   const suspiciousWordsCount = countMatches(
     text,
     /(казино|ставки|кредит|інвестиції|заробіток|розіграш|безкоштовні гроші|наркотики|зброя|жорстоке поводження)/gi,
   );
-  const repeatedCharsCount = countMatches(text, /(.)\1{5,}/gi);
+
+  const repeatedCharsCount = countMatches(text, /(.)\1{8,}/giu);
 
   if (linkCount > 1) {
     reasons.push("Забагато посилань у тексті");
@@ -46,8 +89,12 @@ function analyzeAdContent(payload) {
     reasons.push("Виявлено підозрілі формулювання");
   }
 
-  if (repeatedCharsCount > 0) {
-    reasons.push("Виявлено неприродні повтори символів");
+  if (
+    repeatedCharsCount > 0 ||
+    hasSuspiciousRepeatedWords(text) ||
+    hasSuspiciousRepeatedPhrases(text)
+  ) {
+    reasons.push("Виявлено неприродні повтори в тексті");
   }
 
   const lettersOnly = text.replace(/[^a-zа-яіїєґ]/gi, "");
@@ -56,7 +103,7 @@ function analyzeAdContent(payload) {
     .join(" ")
     .replace(/[^A-ZА-ЯІЇЄҐ]/g, "");
 
-  if (lettersOnly.length > 40 && upperOnly.length / lettersOnly.length > 0.45) {
+  if (lettersOnly.length > 60 && upperOnly.length / lettersOnly.length > 0.55) {
     reasons.push("Забагато тексту великими літерами");
   }
 
