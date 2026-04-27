@@ -27,10 +27,14 @@ router.use("/favorites", favoritesRoutes);
 router.use("/chats", chatsRoutes);
 router.use("/complaints", complaintsRoutes);
 router.use("/moderation", moderationRoutes);
+
 router.use("/my/ads", myAdsRoutes);
+router.use("/my/listings", myAdsRoutes);
+
 router.use("/", reviewsRoutes);
 router.use("/", publicUsersRoutes);
 router.use("/", adsRoutes);
+
 router.use("/admin", adminRoutes);
 
 module.exports = router;

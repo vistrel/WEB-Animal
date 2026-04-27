@@ -1,12 +1,12 @@
 import apiClient from "./axios";
 
 export async function getAdsRequest(params = {}) {
-  const { data } = await apiClient.get("/ads", { params });
+  const { data } = await apiClient.get("/listings", { params });
   return data;
 }
 
 export async function getAdBySlugRequest(slug) {
-  const { data } = await apiClient.get(`/ads/${slug}`);
+  const { data } = await apiClient.get(`/listings/${slug}`);
   return data;
 }
 
