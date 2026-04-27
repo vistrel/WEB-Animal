@@ -239,7 +239,7 @@ function AdsCatalogPage() {
             <div className="catalog-state error">{catalogState.error}</div>
           ) : catalogState.items.length ? (
             <>
-              <div className="ads-grid">
+              <div className="listing-grid">
                 {catalogState.items.map((ad) => (
                   <AdCard key={ad.id} ad={ad} />
                 ))}

@@ -136,7 +136,7 @@ function SellerPage() {
           </div>
 
           {state.ads.length ? (
-            <div className="ads-grid">
+            <div className="listing-grid">
               {state.ads.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}

@@ -337,8 +337,8 @@ body::after {
 .profile-main-card,
 .side-card,
 .state-card,
-.ad-card,
-.ad-details-card,
+.listing-card,
+.listing-details-card,
 .detail-block,
 .seller-card {
   background: var(--surface);
@@ -652,18 +652,18 @@ body::after {
   color: var(--success);
 }
 
-.ads-grid {
+.listing-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-.ad-card {
+.listing-card {
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-.ad-card-image-wrap {
+.listing-card-image-wrap {
   position: relative;
   display: block;
   aspect-ratio: 16 / 10;
@@ -671,32 +671,32 @@ body::after {
   background: var(--surface-muted);
 }
 
-.ad-card-image {
+.listing-card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform var(--transition-normal);
 }
 
-.ad-card:hover .ad-card-image {
+.listing-card:hover .listing-card-image {
   transform: scale(1.04);
 }
 
-.ad-card-badges,
-.ad-details-badges {
+.listing-card-badges,
+.listing-details-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.ad-card-badges {
+.listing-card-badges {
   position: absolute;
   top: 12px;
   left: 12px;
   right: 12px;
 }
 
-.ad-badge {
+.listing-badge {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -709,52 +709,52 @@ body::after {
   backdrop-filter: blur(8px);
 }
 
-.ad-badge.primary {
+.listing-badge.primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-strong));
 }
 
-.ad-card-body {
+.listing-card-body {
   padding: 18px;
   display: grid;
   gap: 14px;
 }
 
-.ad-card-topline {
+.listing-card-topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.ad-card-location {
+.listing-card-location {
   color: var(--text-soft);
   font-size: 14px;
   font-weight: 600;
 }
 
-.ad-card-price {
+.listing-card-price {
   color: var(--primary-strong);
   font-size: 18px;
   font-weight: 800;
 }
 
-.ad-card-title {
+.listing-card-title {
   font-size: 22px;
   line-height: 1.15;
 }
 
-.ad-card-excerpt {
+.listing-card-excerpt {
   color: var(--text-soft);
   font-size: 14px;
 }
 
-.ad-card-meta {
+.listing-card-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.ad-card-meta span {
+.listing-card-meta span {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
@@ -767,19 +767,19 @@ body::after {
   font-weight: 600;
 }
 
-.ad-card-footer {
+.listing-card-footer {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
 }
 
-.ad-card-seller {
+.listing-card-seller {
   display: grid;
   gap: 2px;
 }
 
-.ad-card-seller small {
+.listing-card-seller small {
   color: var(--text-soft);
 }
 
@@ -919,19 +919,19 @@ body::after {
   font-weight: 600;
 }
 
-.ad-details-layout {
+.listing-details-layout {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 20px;
   margin-bottom: 20px;
 }
 
-.ad-gallery {
+.listing-gallery {
   display: grid;
   gap: 12px;
 }
 
-.ad-main-image {
+.listing-main-image {
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
@@ -956,19 +956,19 @@ body::after {
   background: var(--surface);
 }
 
-.ad-details-card {
+.listing-details-card {
   border-radius: var(--radius-lg);
   padding: 24px;
   display: grid;
   gap: 16px;
 }
 
-.ad-details-card h1 {
+.listing-details-card h1 {
   font-size: clamp(28px, 4vw, 42px);
   line-height: 1.08;
 }
 
-.ad-price-row {
+.listing-price-row {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -976,17 +976,17 @@ body::after {
   flex-wrap: wrap;
 }
 
-.ad-price-row strong {
+.listing-price-row strong {
   font-size: 28px;
   color: var(--primary-strong);
 }
 
-.ad-price-row span {
+.listing-price-row span {
   color: var(--text-soft);
   font-weight: 600;
 }
 
-.ad-characteristics {
+.listing-characteristics {
   display: grid;
   gap: 10px;
 }
@@ -1105,8 +1105,8 @@ body::after {
   .profile-grid,
   .cards-grid,
   .details-sections,
-  .ads-grid,
-  .ad-details-layout {
+  .listing-grid,
+  .listing-details-layout {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -1137,8 +1137,8 @@ body::after {
   .cards-grid,
   .footer-inner,
   .details-sections,
-  .ads-grid,
-  .ad-details-layout,
+  .listing-grid,
+  .listing-details-layout,
   .filters-grid {
     grid-template-columns: 1fr;
     display: grid;
@@ -1152,15 +1152,15 @@ body::after {
   .state-card,
   .filters-panel,
   .detail-block,
-  .ad-details-card {
+  .listing-details-card {
     padding: 22px;
   }
 
   .detail-row,
   .results-head,
   .filters-head,
-  .ad-card-footer,
-  .ad-price-row {
+  .listing-card-footer,
+  .listing-price-row {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1218,7 +1218,7 @@ body::after {
   font-size: 20px;
 }
 
-.ad-main-image-wrap {
+.listing-main-image-wrap {
   width: 100%;
   aspect-ratio: 16 / 10;
   border-radius: var(--radius-lg);
@@ -1228,7 +1228,7 @@ body::after {
   box-shadow: var(--shadow-md);
 }
 
-.ad-main-image {
+.listing-main-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1247,15 +1247,15 @@ body::after {
 .profile-main-card,
 .side-card,
 .state-card,
-.ad-card,
-.ad-details-card,
+.listing-card,
+.listing-details-card,
 .detail-block,
 .seller-card {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
-.ad-card-image-link {
+.listing-card-image-link {
   display: block;
   width: 100%;
   height: 100%;
@@ -1303,8 +1303,8 @@ body::after {
   .profile-main-card,
   .side-card,
   .state-card,
-  .ad-card,
-  .ad-details-card,
+  .listing-card,
+  .listing-details-card,
   .detail-block,
   .seller-card,
   .favorite-button {
@@ -1986,52 +1986,52 @@ body::after {
   }
 }
 
-.ads-grid {
+.listing-grid {
   align-items: stretch;
 }
 
-.ad-card {
+.listing-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.ad-card-body {
+.listing-card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.ad-card-excerpt {
+.listing-card-excerpt {
   flex: 0 0 auto;
 }
 
-.ad-card-meta {
+.listing-card-meta {
   margin-bottom: 14px;
 }
 
-.ad-card-footer {
+.listing-card-footer {
   margin-top: auto;
   align-items: flex-end;
 }
 
-.ad-card-seller {
+.listing-card-seller {
   min-width: 0;
 }
 
-.ad-card-seller strong,
-.ad-card-seller small {
+.listing-card-seller strong,
+.listing-card-seller small {
   display: block;
 }
 
 @media (max-width: 520px) {
-  .ad-card-footer {
+  .listing-card-footer {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .ad-card-footer .button,
-  .ad-card-footer .button-secondary {
+  .listing-card-footer .button,
+  .listing-card-footer .button-secondary {
     width: 100%;
   }
 }

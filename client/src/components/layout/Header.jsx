@@ -142,7 +142,7 @@ function Header() {
                 >
                   <span className="user-chip-name">{user.fullName}</span>
                   {totalUnread > 0 ? (
-                    <span className="header-unread-badge">
+                    <span className="header-unrelisting-badge">
                       {totalUnread > 9 ? "9+" : totalUnread}
                     </span>
                   ) : null}

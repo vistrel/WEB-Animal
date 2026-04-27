@@ -40,22 +40,22 @@ function AdCard({ ad }) {
   }
 
   return (
-    <article className="ad-card">
-      <div className="ad-card-image-wrap">
-        <Link to={`/ads/${ad.slug}`} className="ad-card-image-link">
+    <article className="listing-card">
+      <div className="listing-card-image-wrap">
+        <Link to={`/ads/${ad.slug}`} className="listing-card-image-link">
           <img
-            className="ad-card-image"
+            className="listing-card-image"
             src={getAdImage(ad)}
             alt={ad.title}
             onError={handleImageError}
           />
         </Link>
 
-        <div className="ad-card-badges">
-          <span className="ad-badge primary">
+        <div className="listing-card-badges">
+          <span className="listing-badge primary">
             {adTypeLabels[ad.adType] || ad.adType}
           </span>
-          <span className="ad-badge">
+          <span className="listing-badge">
             {statusLabels[ad.status] || ad.status}
           </span>
         </div>
@@ -71,27 +71,27 @@ function AdCard({ ad }) {
         </button>
       </div>
 
-      <div className="ad-card-body">
-        <div className="ad-card-topline">
-          <span className="ad-card-location">{ad.city}</span>
-          <span className="ad-card-price">{formatPrice(ad.price)}</span>
+      <div className="listing-card-body">
+        <div className="listing-card-topline">
+          <span className="listing-card-location">{ad.city}</span>
+          <span className="listing-card-price">{formatPrice(ad.price)}</span>
         </div>
 
-        <h3 className="ad-card-title">
+        <h3 className="listing-card-title">
           <Link to={`/ads/${ad.slug}`}>{ad.title}</Link>
         </h3>
 
-        <p className="ad-card-excerpt">{ad.descriptionExcerpt}</p>
+        <p className="listing-card-excerpt">{ad.descriptionExcerpt}</p>
 
-        <div className="ad-card-meta">
+        <div className="listing-card-meta">
           <span>{ad.petType?.name || "Тварина"}</span>
           <span>{ad.breed?.name || "Порода не вказана"}</span>
           <span>{genderLabels[ad.animalGender] || "Невідомо"}</span>
           <span>{formatAge(ad.ageMonths)}</span>
         </div>
 
-        <div className="ad-card-footer">
-          <div className="ad-card-seller">
+        <div className="listing-card-footer">
+          <div className="listing-card-seller">
             <strong>{ad.author?.fullName || "Користувач"}</strong>
             <small>
               Рейтинг {Number(ad.author?.averageRating || 0).toFixed(2)} ·

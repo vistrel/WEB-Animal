@@ -456,7 +456,7 @@ function ProfilePage() {
           </aside>
         </div>
 
-        <section className="my-ads-section">
+        <section className="my-listings-section">
           <div className="results-head">
             <div>
               <h2>Мої оголошення</h2>
@@ -475,18 +475,18 @@ function ProfilePage() {
           ) : adsState.error ? (
             <div className="catalog-state error">{adsState.error}</div>
           ) : adsState.items.length ? (
-            <div className="my-ads-list">
+            <div className="my-listings-list">
               {adsState.items.map((ad) => (
-                <article className="my-ad-card" key={ad.id}>
+                <article className="my-listing-card" key={ad.id}>
                   <img
-                    className="my-ad-image"
+                    className="my-listing-image"
                     src={getAdImage(ad)}
                     alt={ad.title}
                     onError={(event) => handleImageError(event, ad.title)}
                   />
 
-                  <div className="my-ad-body">
-                    <div className="my-ad-top">
+                  <div className="my-listing-body">
+                    <div className="my-listing-top">
                       <div>
                         <h3>{ad.title}</h3>
                         <p>
@@ -498,7 +498,7 @@ function ProfilePage() {
                       <strong>{formatPrice(ad.price)}</strong>
                     </div>
 
-                    <div className="my-ad-tags">
+                    <div className="my-listing-tags">
                       <span>{statusLabels[ad.status] || ad.status}</span>
                       <span>
                         {moderationLabels[ad.moderationFlag] ||
@@ -508,10 +508,12 @@ function ProfilePage() {
                     </div>
 
                     {ad.moderationReason ? (
-                      <p className="my-ad-warning">{ad.moderationReason}</p>
+                      <p className="my-listing-warning">
+                        {ad.moderationReason}
+                      </p>
                     ) : null}
 
-                    <div className="my-ad-actions">
+                    <div className="my-listing-actions">
                       <Link
                         to={`/ads/${ad.slug}`}
                         className="button button-secondary"

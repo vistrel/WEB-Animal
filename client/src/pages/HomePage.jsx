@@ -202,9 +202,7 @@ function HomePage() {
         <section className="marketplace-hero">
           <div className="marketplace-hero-copy">
             <span className="hero-kicker">Маркетплейс домашніх тварин</span>
-            <h1>
-              Знайдіть улюбленця за зручними параметрами вже з головної сторінки
-            </h1>
+            <h1>Знайдіть улюбленця за зручними параметрами вже зараз!</h1>
             <p>
               Шукайте оголошення за видом тварини, породою, містом, віком, ціною
               та типом оголошення без зайвих переходів.
@@ -244,7 +242,7 @@ function HomePage() {
           ) : adsState.error ? (
             <div className="catalog-state error">{adsState.error}</div>
           ) : adsState.items.length ? (
-            <div className="ads-grid">
+            <div className="listing-grid">
               {adsState.items.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}

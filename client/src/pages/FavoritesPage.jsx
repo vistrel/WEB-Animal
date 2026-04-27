@@ -69,7 +69,7 @@ function FavoritesPage() {
         ) : state.error ? (
           <div className="catalog-state error">{state.error}</div>
         ) : state.items.length ? (
-          <div className="ads-grid">
+          <div className="listing-grid">
             {state.items.map((ad) => (
               <AdCard key={ad.id} ad={ad} />
             ))}

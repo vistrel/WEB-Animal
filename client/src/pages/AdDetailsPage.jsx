@@ -259,11 +259,11 @@ function AdDetailsPage() {
           <span>{ad.title}</span>
         </div>
 
-        <section className="ad-details-layout">
-          <div className="ad-gallery">
-            <div className="ad-main-image-wrap">
+        <section className="listing-details-layout">
+          <div className="listing-gallery">
+            <div className="listing-main-image-wrap">
               <img
-                className="ad-main-image"
+                className="listing-main-image"
                 src={gallery[0].url}
                 alt={ad.title}
                 onError={handleMainImageError}
@@ -289,19 +289,19 @@ function AdDetailsPage() {
             ) : null}
           </div>
 
-          <div className="ad-details-card">
-            <div className="ad-details-badges">
-              <span className="ad-badge primary">
+          <div className="listing-details-card">
+            <div className="listing-details-badges">
+              <span className="listing-badge primary">
                 {adTypeLabels[ad.adType] || ad.adType}
               </span>
-              <span className="ad-badge">
+              <span className="listing-badge">
                 {statusLabels[ad.status] || ad.status}
               </span>
             </div>
 
             <h1>{ad.title}</h1>
 
-            <div className="ad-price-row">
+            <div className="listing-price-row">
               <strong>{formatPrice(ad.price)}</strong>
               <span>
                 {ad.city}
@@ -309,7 +309,7 @@ function AdDetailsPage() {
               </span>
             </div>
 
-            <div className="ad-details-actions">
+            <div className="listing-details-actions">
               <button
                 type="button"
                 className={`button ${isFavorite ? "button-secondary" : ""}`}
@@ -333,7 +333,7 @@ function AdDetailsPage() {
               </button>
             </div>
 
-            <div className="ad-characteristics">
+            <div className="listing-characteristics">
               <div className="detail-row">
                 <span>Вид тварини</span>
                 <strong>{ad.petType?.name || "Не вказано"}</strong>
@@ -527,7 +527,7 @@ function AdDetailsPage() {
               </div>
             </div>
 
-            <div className="ads-grid">
+            <div className="listing-grid">
               {state.similarAds.map((item) => (
                 <AdCard key={item.id} ad={item} />
               ))}

@@ -205,7 +205,7 @@
   background: var(--surface-muted);
 }
 
-.ad-details-actions {
+.listing-details-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -259,7 +259,7 @@
 }
 
 .conversation-unread,
-.header-unread-badge,
+.header-unrelisting-badge,
 .dropdown-link-with-badge strong {
   min-width: 22px;
   height: 22px;
@@ -272,7 +272,7 @@
   font-weight: 800;
 }
 
-.header-unread-badge {
+.header-unrelisting-badge {
   margin-left: 4px;
 }
 

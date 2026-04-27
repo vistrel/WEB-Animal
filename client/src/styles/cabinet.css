@@ -35,18 +35,18 @@
   margin-bottom: 18px;
 }
 
-.my-ads-section {
+.my-listings-section {
   margin-top: 26px;
   display: grid;
   gap: 18px;
 }
 
-.my-ads-list {
+.my-listings-list {
   display: grid;
   gap: 16px;
 }
 
-.my-ad-card {
+.my-listing-card {
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 18px;
@@ -57,7 +57,7 @@
   box-shadow: var(--shadow-md);
 }
 
-.my-ad-image {
+.my-listing-image {
   width: 100%;
   height: 100%;
   min-height: 180px;
@@ -66,40 +66,40 @@
   background: var(--surface-muted);
 }
 
-.my-ad-body {
+.my-listing-body {
   display: grid;
   gap: 14px;
 }
 
-.my-ad-top {
+.my-listing-top {
   display: flex;
   justify-content: space-between;
   gap: 16px;
 }
 
-.my-ad-top h3 {
+.my-listing-top h3 {
   font-size: 24px;
   line-height: 1.15;
   margin-bottom: 6px;
 }
 
-.my-ad-top p {
+.my-listing-top p {
   color: var(--text-soft);
 }
 
-.my-ad-top strong {
+.my-listing-top strong {
   color: var(--primary-strong);
   font-size: 22px;
   white-space: nowrap;
 }
 
-.my-ad-tags {
+.my-listing-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.my-ad-tags span {
+.my-listing-tags span {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
@@ -112,7 +112,7 @@
   font-weight: 700;
 }
 
-.my-ad-warning,
+.my-listing-warning,
 .moderation-alert {
   padding: 12px 14px;
   border-radius: 16px;
@@ -128,7 +128,7 @@
   gap: 4px;
 }
 
-.my-ad-actions {
+.my-listing-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -243,7 +243,7 @@
 @media (max-width: 860px) {
   .profile-heading,
   .page-toolbar,
-  .my-ad-top {
+  .my-listing-top {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -253,12 +253,12 @@
     justify-content: flex-start;
   }
 
-  .my-ad-card,
+  .my-listing-card,
   .form-grid.two-columns {
     grid-template-columns: 1fr;
   }
 
-  .my-ad-image {
+  .my-listing-image {
     min-height: auto;
     aspect-ratio: 16 / 10;
   }
