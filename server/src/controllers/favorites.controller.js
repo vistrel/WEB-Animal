@@ -3,7 +3,7 @@ const ApiError = require("../utils/api-error");
 const asyncHandler = require("../utils/async-handler");
 const { serializeAdCard } = require("../utils/ad-serializers");
 
-const visibleStatuses = ["ACTIVE", "RESERVED", "SOLD"];
+const visibleStatuses = ["ACTIVE", "RESERVED", "SOLD", "FLAGGED"];
 
 const favoriteAdInclude = {
   ad: {

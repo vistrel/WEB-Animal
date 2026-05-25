@@ -22,6 +22,7 @@ import {
 
 import ComplaintForm from "../components/common/ComplaintForm";
 import { createAdComplaintRequest } from "../api/complaints.api";
+import ImageGallery from "../components/common/ImageGallery";
 
 function AdDetailsPage() {
   const { slug } = useParams();
@@ -261,32 +262,10 @@ function AdDetailsPage() {
 
         <section className="listing-details-layout">
           <div className="listing-gallery">
-            <div className="listing-main-image-wrap">
-              <img
-                className="listing-main-image"
-                src={gallery[0].url}
-                alt={ad.title}
-                onError={handleMainImageError}
-              />
-            </div>
-
-            {gallery.length > 1 ? (
-              <div className="ad-thumbs">
-                {gallery.map((image) => (
-                  <img
-                    key={image.id}
-                    className="ad-thumb"
-                    src={image.url}
-                    alt={ad.title}
-                    onError={(event) => {
-                      event.currentTarget.src = createPlaceholderImage(
-                        ad.title,
-                      );
-                    }}
-                  />
-                ))}
-              </div>
-            ) : null}
+            <ImageGallery
+              items={gallery}
+              placeholderTitle={ad.title}
+            />
           </div>
 
           <div className="listing-details-card">

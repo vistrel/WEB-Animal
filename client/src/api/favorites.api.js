@@ -1,4 +1,5 @@
 import apiClient from "./axios";
+import { getAdBySlugRequest } from "./ads.api";
 
 function authHeaders(accessToken) {
   return {
@@ -43,13 +44,35 @@ export async function removeFavoriteRequest(adId, accessToken) {
 }
 
 export async function toggleFavoriteRequest(adId, accessToken) {
-  const { data } = await apiClient.post(
-    `/favorites/${adId}/toggle`,
-    {},
-    {
-      headers: authHeaders(accessToken),
-    },
-  );
+  try {
+    const { data } = await apiClient.post(
+      `/favorites/${adId}/toggle`,
+      {},
+      {
+        headers: authHeaders(accessToken),
+      },
+    );
 
-  return data;
+    return data;
+  } catch (error) {
+    if (error?.response?.status === 404) {
+      try {
+        const details = await getAdBySlugRequest(adId);
+        const realId = details?.item?.id;
+        if (realId) {
+          const { data } = await apiClient.post(
+            `/favorites/${realId}/toggle`,
+            {},
+            {
+              headers: authHeaders(accessToken),
+            },
+          );
+
+          return data;
+        }
+      } catch (err) {}
+    }
+
+    throw error;
+  }
 }
