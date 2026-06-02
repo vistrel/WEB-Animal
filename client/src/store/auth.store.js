@@ -8,6 +8,7 @@ import {
 } from "../api/auth.api";
 
 const AUTH_FLAG_KEY = "pet-platform-has-session";
+const AUTH_SESSION_KEY = "pet-platform-session";
 
 function setAuthFlag() {
   localStorage.setItem(AUTH_FLAG_KEY, "1");
@@ -21,6 +22,40 @@ function hasAuthFlag() {
   return localStorage.getItem(AUTH_FLAG_KEY) === "1";
 }
 
+function saveStoredSession({ user, accessToken }) {
+  localStorage.setItem(
+    AUTH_SESSION_KEY,
+    JSON.stringify({
+      user,
+      accessToken,
+    }),
+  );
+}
+
+function getStoredSession() {
+  try {
+    const raw = localStorage.getItem(AUTH_SESSION_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    const session = JSON.parse(raw);
+
+    if (!session?.user || !session?.accessToken) {
+      return null;
+    }
+
+    return session;
+  } catch (error) {
+    return null;
+  }
+}
+
+function clearStoredSession() {
+  localStorage.removeItem(AUTH_SESSION_KEY);
+}
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   accessToken: null,
@@ -28,6 +63,7 @@ export const useAuthStore = create((set, get) => ({
 
   setSession: ({ user, accessToken }) => {
     setAuthFlag();
+    saveStoredSession({ user, accessToken });
 
     set({
       user,
@@ -38,6 +74,7 @@ export const useAuthStore = create((set, get) => ({
 
   clearSession: () => {
     clearAuthFlag();
+    clearStoredSession();
 
     set({
       user: null,
@@ -47,6 +84,20 @@ export const useAuthStore = create((set, get) => ({
   },
 
   initializeAuth: async () => {
+    const storedSession = getStoredSession();
+
+    if (storedSession) {
+      setAuthFlag();
+
+      set({
+        user: storedSession.user,
+        accessToken: storedSession.accessToken,
+        isInitializing: false,
+      });
+
+      return;
+    }
+
     if (!hasAuthFlag()) {
       set({
         user: null,
@@ -61,6 +112,10 @@ export const useAuthStore = create((set, get) => ({
       const data = await refreshRequest();
 
       setAuthFlag();
+      saveStoredSession({
+        user: data.user,
+        accessToken: data.accessToken,
+      });
 
       set({
         user: data.user,
@@ -69,6 +124,7 @@ export const useAuthStore = create((set, get) => ({
       });
     } catch (error) {
       clearAuthFlag();
+      clearStoredSession();
 
       set({
         user: null,
@@ -82,6 +138,10 @@ export const useAuthStore = create((set, get) => ({
     const data = await registerRequest(payload);
 
     setAuthFlag();
+    saveStoredSession({
+      user: data.user,
+      accessToken: data.accessToken,
+    });
 
     set({
       user: data.user,
@@ -96,6 +156,10 @@ export const useAuthStore = create((set, get) => ({
     const data = await loginRequest(payload);
 
     setAuthFlag();
+    saveStoredSession({
+      user: data.user,
+      accessToken: data.accessToken,
+    });
 
     set({
       user: data.user,
@@ -111,6 +175,7 @@ export const useAuthStore = create((set, get) => ({
       await logoutRequest();
     } finally {
       clearAuthFlag();
+      clearStoredSession();
 
       set({
         user: null,
@@ -127,12 +192,30 @@ export const useAuthStore = create((set, get) => ({
       return null;
     }
 
-    const data = await meRequest(accessToken);
+    try {
+      const data = await meRequest(accessToken);
 
-    set({
-      user: data.user,
-    });
+      saveStoredSession({
+        user: data.user,
+        accessToken,
+      });
 
-    return data.user;
+      set({
+        user: data.user,
+      });
+
+      return data.user;
+    } catch (error) {
+      clearAuthFlag();
+      clearStoredSession();
+
+      set({
+        user: null,
+        accessToken: null,
+        isInitializing: false,
+      });
+
+      throw error;
+    }
   },
 }));
