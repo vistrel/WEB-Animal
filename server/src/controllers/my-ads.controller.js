@@ -10,6 +10,10 @@ const {
   serializeAdCard,
   serializeAdDetails,
 } = require("../utils/ad-serializers");
+const {
+  isCloudinaryEnabled,
+  uploadImageBuffer,
+} = require("../utils/cloudinary");
 
 const ownAdInclude = {
   petType: {
@@ -122,6 +126,44 @@ function getImageAbsolutePath(imagePath) {
     .replace(/^\/+/, "");
 
   return path.join(env.UPLOAD_DIR, normalized);
+}
+
+function removeLocalFiles(files = []) {
+  for (const file of files) {
+    if (file.path) {
+      fs.unlink(file.path, () => null);
+    }
+  }
+}
+
+async function buildUploadedImagesData(files, adId, currentCount) {
+  const useCloudinary = isCloudinaryEnabled();
+  const images = [];
+
+  for (const [index, file] of files.entries()) {
+    let storedPath;
+
+    if (useCloudinary) {
+      const result = await uploadImageBuffer(file.buffer, {
+        folder: "petua/ads",
+      });
+
+      storedPath = result.secure_url;
+    } else {
+      storedPath = `ads/${file.filename}`;
+    }
+
+    images.push({
+      adId,
+      path: storedPath,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
+      sortOrder: currentCount + index,
+    });
+  }
+
+  return images;
 }
 
 const listMyAds = asyncHandler(async (req, res) => {
@@ -344,6 +386,7 @@ const uploadMyAdImages = asyncHandler(async (req, res) => {
   });
 
   if (!ad) {
+    removeLocalFiles(req.files);
     throw new ApiError(404, "Оголошення не знайдено");
   }
 
@@ -354,9 +397,7 @@ const uploadMyAdImages = asyncHandler(async (req, res) => {
   }
 
   if (ad.images.length + files.length > 10) {
-    for (const file of files) {
-      fs.unlink(file.path, () => null);
-    }
+    removeLocalFiles(files);
 
     throw new ApiError(
       400,
@@ -365,16 +406,14 @@ const uploadMyAdImages = asyncHandler(async (req, res) => {
   }
 
   const currentCount = ad.images.length;
+  const uploadedImages = await buildUploadedImagesData(
+    files,
+    ad.id,
+    currentCount,
+  );
 
   await prisma.adImage.createMany({
-    data: files.map((file, index) => ({
-      adId: ad.id,
-      path: `ads/${file.filename}`,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: file.size,
-      sortOrder: currentCount + index,
-    })),
+    data: uploadedImages,
   });
 
   const updatedAd = await prisma.ad.findUnique({
@@ -412,9 +451,14 @@ const deleteMyAdImage = asyncHandler(async (req, res) => {
     where: { id: image.id },
   });
 
-  const filePath = getImageAbsolutePath(image.path);
-
-  fs.unlink(filePath, () => null);
+  if (
+    image.path &&
+    !image.path.startsWith("http://") &&
+    !image.path.startsWith("https://")
+  ) {
+    const filePath = getImageAbsolutePath(image.path);
+    fs.unlink(filePath, () => null);
+  }
 
   res.json({
     message: "Фото видалено",

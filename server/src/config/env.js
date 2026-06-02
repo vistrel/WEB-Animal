@@ -28,6 +28,8 @@ const env = {
   BCRYPT_SALT_ROUNDS: Number(process.env.BCRYPT_SALT_ROUNDS || 10),
 
   UPLOAD_DIR: path.resolve(process.cwd(), process.env.UPLOAD_DIR || "uploads"),
+
+  CLOUDINARY_URL: process.env.CLOUDINARY_URL || null,
 };
 
 module.exports = env;

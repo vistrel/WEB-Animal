@@ -45,10 +45,12 @@ function getRefreshTokenExpiresAt() {
 }
 
 function getRefreshCookieOptions() {
+  const isProduction = env.NODE_ENV === "production";
+
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
     maxAge: parseDurationToMs(env.REFRESH_TOKEN_EXPIRES_IN),
     path: "/api/auth",
   };

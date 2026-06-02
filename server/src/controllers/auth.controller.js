@@ -171,16 +171,14 @@ const refresh = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Ваш акаунт заблоковано");
   }
 
-  await prisma.refreshToken.update({
-    where: { id: storedToken.id },
-    data: { revokedAt: new Date() },
-  });
+  const accessToken = signAccessToken(storedToken.user);
 
-  return createSession({
-    user: storedToken.user,
-    req,
-    res,
+  res.cookie(env.COOKIE_NAME, rawToken, getRefreshCookieOptions());
+
+  return res.json({
     message: "Сесію оновлено успішно",
+    accessToken,
+    user: serializeUser(storedToken.user),
   });
 });
 

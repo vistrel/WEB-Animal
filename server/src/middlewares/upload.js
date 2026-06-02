@@ -4,6 +4,7 @@ const path = require("path");
 const multer = require("multer");
 const env = require("../config/env");
 const ApiError = require("../utils/api-error");
+const { isCloudinaryEnabled } = require("../utils/cloudinary");
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 const allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
@@ -46,7 +47,9 @@ function fileFilter(req, file, callback) {
 }
 
 const uploadAdImages = multer({
-  storage: createStorage(adsUploadDir),
+  storage: isCloudinaryEnabled()
+    ? multer.memoryStorage()
+    : createStorage(adsUploadDir),
   fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024,
